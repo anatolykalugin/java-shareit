@@ -15,6 +15,7 @@ public class UserController {
 
     @Autowired
     private UserService userService;
+
     @GetMapping
     public Set<UserDto> getAllUsers() {
         return userService.getAllUsers();
