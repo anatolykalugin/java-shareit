@@ -68,14 +68,11 @@ public class UserRepository {
     }
 
     public UserDto getUserById(Long id) {
-        try {
-            if (users.containsKey(id)) {
-                return userMapper.mapTo(users.get(id));
-            }
-        } catch (RuntimeException e) {
+        if (users.containsKey(id)) {
+            return userMapper.mapTo(users.get(id));
+        } else {
             throw new NotFoundException("Не найден юзер с данным id");
         }
-        return null;
     }
 
     public Set<UserDto> getAllUsers() {
@@ -87,10 +84,10 @@ public class UserRepository {
     }
 
     public void deleteUserById(Long id) {
-        try {
+        if (users.containsKey(id)) {
             emails.remove(users.get(id).getEmail());
             users.remove(id);
-        } catch (RuntimeException e) {
+        } else {
             throw new NotFoundException("Не найден юзер с данным id");
         }
     }

@@ -50,20 +50,17 @@ public class ItemRepository {
     }
 
     public ItemDto getItemById(Long itemId) {
-        try {
-            if (items.containsKey(itemId)) {
-                return itemMapper.mapTo(items.get(itemId));
-            }
-        } catch (RuntimeException e) {
+        if (items.containsKey(itemId)) {
+            return itemMapper.mapTo(items.get(itemId));
+        } else {
             throw new NotFoundException("Не найден предмет с данным id");
         }
-        return null;
     }
 
     public void deleteItemById(Long itemId) {
-        try {
+        if (items.containsKey(itemId)) {
             items.remove(itemId);
-        } catch (RuntimeException e) {
+        } else {
             throw new NotFoundException("Не найден предмет с данным id");
         }
     }
