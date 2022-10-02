@@ -1,6 +1,7 @@
 package ru.practicum.shareit.item.dto;
 
 import lombok.*;
+import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.item.comment.CommentDto;
 
 import java.util.List;
@@ -12,11 +13,12 @@ import java.util.List;
 @ToString
 @EqualsAndHashCode
 @Builder
-public class ItemDto {
+public class ItemWithBookingsDto {
     private Long id;
     private String name;
     private String description;
     private Boolean available;
-    private Long owner;
+    private BookingDto lastBooking;
+    private BookingDto nextBooking;
     private List<CommentDto> commentDtoList;
 }

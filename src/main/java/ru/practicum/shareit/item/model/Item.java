@@ -1,10 +1,8 @@
 package ru.practicum.shareit.item.model;
 
 import lombok.*;
-import ru.practicum.shareit.Create;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
+import javax.persistence.*;
 
 @Getter
 @Setter
@@ -12,13 +10,19 @@ import javax.validation.constraints.NotNull;
 @AllArgsConstructor
 @ToString
 @EqualsAndHashCode
+@Entity
+@Table(name = "items")
 public class Item {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
     private Long id;
-    @NotBlank(groups = {Create.class})
+    @Column(name = "name", nullable = false)
     private String name;
-    @NotBlank(groups = {Create.class})
+    @Column(name = "description")
     private String description;
-    @NotNull(groups = {Create.class})
+    @Column(name = "available")
     private Boolean available;
+    @Column(name = "owner")
     private Long owner;
 }
