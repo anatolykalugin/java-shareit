@@ -3,6 +3,7 @@ package ru.practicum.shareit.item.model;
 import lombok.*;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
 
 @Getter
 @Setter
@@ -17,8 +18,10 @@ public class Item {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Long id;
+    @NotBlank
     @Column(name = "name", nullable = false)
     private String name;
+    @NotBlank
     @Column(name = "description")
     private String description;
     @Column(name = "available")

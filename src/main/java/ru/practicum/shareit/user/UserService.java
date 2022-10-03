@@ -11,7 +11,7 @@ import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.dto.UserMapper;
 import ru.practicum.shareit.user.model.User;
 
-import java.util.Set;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
@@ -49,12 +49,12 @@ public class UserService {
         }
     }
 
-    public Set<UserDto> getAllUsers() {
+    public List<UserDto> getAllUsers() {
         log.info("Запрос на получение всех юзеров");
         return userRepository.findAll()
                 .stream()
                 .map(UserMapper::mapTo)
-                .collect(Collectors.toSet());
+                .collect(Collectors.toList());
     }
 
     public UserDto getUserById(Long id) {

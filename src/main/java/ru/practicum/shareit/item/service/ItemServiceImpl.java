@@ -22,6 +22,7 @@ import ru.practicum.shareit.user.UserService;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -103,14 +104,20 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
+    @Transactional
     public List<ItemDto> searchItemsByText(String text) {
         log.info("Запрос на поиск вещей по тексту");
-        List<Item> itemList = new ArrayList<>(itemRepository.searchItemsByText(text));
-        List<ItemDto> itemDtos = new ArrayList<>();
-        for (Item i : itemList) {
-            itemDtos.add(ItemMapper.mapTo(i, getItemsCommentsDtos(i.getId())));
+        if (!text.isBlank()) {
+            Collection<Item> itemList = itemRepository.searchItemsByText(text
+                    .toLowerCase());
+            List<ItemDto> itemDtos = new ArrayList<>();
+            for (Item i : itemList) {
+                itemDtos.add(ItemMapper.mapTo(i, getItemsCommentsDtos(i.getId())));
+            }
+            return itemDtos;
+        } else {
+            return new ArrayList<>();
         }
-        return itemDtos;
     }
 
     @Override
@@ -138,7 +145,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
     private Item validateItemForUpdate(Long itemId, Long userId, Item item) {
-        if (userService.getUserById(userId) != null) {
+        if (userService.getUserById(userId) != null && getItemById(itemId).getOwner().equals(userId)) {
             Item itemToUpdate = ItemMapper.mapFrom(getItemById(itemId));
             itemToUpdate.setOwner(userId);
             if (item.getName() != null && !item.getName().isBlank()) {
