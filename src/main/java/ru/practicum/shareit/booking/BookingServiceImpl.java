@@ -29,9 +29,10 @@ public class BookingServiceImpl implements BookingService {
     public BookingDto createBooking(BookingDto bookingDto, Long bookerId) {
         log.info("Запрос на добавление брони");
         if (userService.getUserById(bookerId) != null &&
-                itemService.getItemById(bookingDto.getId()) != null) {
+                itemService.getItemById(bookingDto.getItemId()) != null) {
             Booking booking = BookingMapper.mapFrom(bookingDto);
             if (isBookingValid(booking)) {
+                booking.setBooker(bookerId);
                 booking.setStatus(Status.WAITING);
                 bookingRepository.save(booking);
                 return BookingMapper.mapTo(booking);
@@ -64,7 +65,7 @@ public class BookingServiceImpl implements BookingService {
                 .orElseThrow(() -> new NotFoundException("Не найдена бронь"));
         if (userService.getUserById(userId) != null &&
                 (booking.getBooker().equals(userId) ||
-                        itemService.getItemById(booking.getItem()).getOwner().equals(userId))) {
+                        itemService.getItemById(booking.getItemId()).getOwner().equals(userId))) {
             return BookingMapper.mapTo(booking);
         } else {
             throw new ValidationException("Бронь может посмотреть только владелец или автор брони");
@@ -142,7 +143,8 @@ public class BookingServiceImpl implements BookingService {
     }
 
     private boolean isBookingValid(Booking booking) {
-        return !booking.getEnd().isBefore(LocalDateTime.now()) &&
+        return itemService.getItemById(booking.getItemId()).getAvailable() &&
+                !booking.getEnd().isBefore(LocalDateTime.now()) &&
                 !booking.getStart().isBefore(LocalDateTime.now()) &&
                 !booking.getEnd().isBefore(booking.getStart());
     }

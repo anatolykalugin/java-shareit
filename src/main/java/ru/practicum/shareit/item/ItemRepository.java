@@ -11,7 +11,7 @@ import java.util.List;
 public interface ItemRepository extends JpaRepository<Item, Long> {
     List<Item> getItemsByOwnerOrderByIdAsc(Long userId);
 
-    @Query("select i from Item i where ((LOWER(i.name) like LOWER(concat('%', :text, '%'))) " +
-            "or (LOWER(i.description) like LOWER(concat('%', :text, '%'))))")
+    @Query("select i from Item i where (i.available = true) and (lower(i.name) like lower(concat('%', :text, '%')) " +
+            "or lower(i.description) like lower(concat('%', :text, '%')))")
     Collection<Item> searchItemsByText(@Param("text") String text);
 }

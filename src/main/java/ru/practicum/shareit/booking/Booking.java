@@ -22,7 +22,7 @@ public class Booking {
     @Column(name = "end_date")
     private LocalDateTime end;
     @Column(name = "item")
-    private Long item;
+    private Long itemId;
     @Column(name = "booker")
     private Long booker;
     @Enumerated(EnumType.STRING)
