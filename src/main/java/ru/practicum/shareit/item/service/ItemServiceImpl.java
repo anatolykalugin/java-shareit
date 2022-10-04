@@ -90,9 +90,9 @@ public class ItemServiceImpl implements ItemService {
             List<ItemWithBookingsDto> listToShow = new ArrayList<>();
             for (Item i : itemSet) {
                 ItemWithBookingsDto itemToAdd = ItemMapper.mapToWithBookings(i,
-                        BookingMapper.mapTo(bookingRepository.findTopByItemIdAndEndBeforeOrderByEndDesc(i.getId(),
+                        BookingMapper.mapTo(bookingRepository.findTopByItem_IdAndEndBeforeOrderByEndDesc(i.getId(),
                                 LocalDateTime.now())),
-                        BookingMapper.mapTo(bookingRepository.findTopByItemIdAndStartAfterOrderByStartAsc(i.getId(),
+                        BookingMapper.mapTo(bookingRepository.findTopByItem_IdAndStartAfterOrderByStartAsc(i.getId(),
                                 LocalDateTime.now())),
                         getItemsCommentsDtos(i.getId()));
                 listToShow.add(itemToAdd);
@@ -176,7 +176,7 @@ public class ItemServiceImpl implements ItemService {
         }
         List<Booking> bookings = bookingRepository.findPastApprovedBookingsByBooker(userId, LocalDateTime.now());
         for (Booking b : bookings) {
-            if (b.getItemId().equals(itemId)) {
+            if (b.getItem().getId().equals(itemId)) {
                 isValid = true;
                 break;
             }
