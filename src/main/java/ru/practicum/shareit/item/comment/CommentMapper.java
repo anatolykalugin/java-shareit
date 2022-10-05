@@ -1,23 +1,25 @@
 package ru.practicum.shareit.item.comment;
 
+import ru.practicum.shareit.user.model.User;
+
 public class CommentMapper {
 
     public static CommentDto mapTo(Comment comment) {
         return new CommentDto(
                 comment.getId(),
-                comment.getTexts(),
+                comment.getText(),
                 comment.getItemId(),
-                comment.getAuthorId(),
+                comment.getAuthor().getName(),
                 comment.getCreated()
         );
     }
 
-    public static Comment mapFrom(CommentDto commentDto) {
+    public static Comment mapFrom(CommentDto commentDto, User user) {
         return new Comment(
                 commentDto.getId(),
-                commentDto.getTexts(),
+                commentDto.getText(),
                 commentDto.getItemId(),
-                commentDto.getAuthorId(),
+                user,
                 commentDto.getCreated()
         );
     }

@@ -33,13 +33,17 @@ public class BookingServiceImpl implements BookingService {
         if (userService.getUserById(bookerId) != null &&
                 itemService.getItemById(bookingDto.getItemId()) != null) {
             Booking booking = BookingMapper.mapFrom(bookingDto, UserMapper.mapFrom(userService.getUserById(bookerId)),
-                    ItemMapper.mapFrom(itemService.getItemById(bookingDto.getItemId())));
-            if (isBookingValid(booking)) {
-                booking.setStatus(Status.WAITING);
-                bookingRepository.save(booking);
-                return BookingMapper.mapTo(booking);
+                    ItemMapper.mapFrom(itemService.getSimpleItemById(bookingDto.getItemId())));
+            if (!itemService.getSimpleItemById(bookingDto.getItemId()).getOwner().equals(bookerId)) {
+                if (isBookingValid(booking)) {
+                    booking.setStatus(Status.WAITING);
+                    bookingRepository.save(booking);
+                    return BookingMapper.mapTo(booking);
+                } else {
+                    throw new ValidationException("Не пройдена валидация бронмрования.");
+                }
             } else {
-                throw new ValidationException("Не пройдена валидация бронмрования.");
+                throw new NotFoundException("Нельзя забронировать свою вещь");
             }
         } else {
             throw new NotFoundException("Неправильный юзер или предмет.");
@@ -51,13 +55,21 @@ public class BookingServiceImpl implements BookingService {
     public BookingDto updateBooking(Long bookingId, Long ownerId, Boolean isApproved) {
         log.info("Запрос на обновление брони");
         Booking bookingToUpdate = getNotDtoById(bookingId);
-        if (isApproved) {
-            bookingToUpdate.setStatus(Status.APPROVED);
+        if (!ownerId.equals(bookingToUpdate.getBooker().getId())) {
+            if (!bookingToUpdate.getStatus().equals(Status.APPROVED)) {
+                if (isApproved) {
+                    bookingToUpdate.setStatus(Status.APPROVED);
+                } else {
+                    bookingToUpdate.setStatus(Status.REJECTED);
+                }
+                bookingRepository.save(bookingToUpdate);
+                return BookingMapper.mapTo(bookingToUpdate);
+            } else {
+                throw new ValidationException("Бронь уже подтверждена, нельзя отказать");
+            }
         } else {
-            bookingToUpdate.setStatus(Status.REJECTED);
+            throw new NotFoundException("Обновить бронь может только владелец");
         }
-        bookingRepository.save(bookingToUpdate);
-        return BookingMapper.mapTo(bookingToUpdate);
     }
 
     @Override
@@ -67,7 +79,7 @@ public class BookingServiceImpl implements BookingService {
                 .orElseThrow(() -> new NotFoundException("Не найдена бронь"));
         if (userService.getUserById(userId) != null &&
                 (booking.getBooker().getId().equals(userId) ||
-                        itemService.getItemById(booking.getItem().getId()).getOwner().equals(userId))) {
+                        itemService.getSimpleItemById(booking.getItem().getId()).getOwner().equals(userId))) {
             return BookingMapper.mapTo(booking);
         } else {
             throw new NotFoundException("Бронь может посмотреть только владелец или автор брони");

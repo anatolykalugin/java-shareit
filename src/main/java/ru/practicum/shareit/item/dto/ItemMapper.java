@@ -1,10 +1,12 @@
 package ru.practicum.shareit.item.dto;
 
-import ru.practicum.shareit.booking.dto.BookingDto;
+import ru.practicum.shareit.booking.Booking;
+import ru.practicum.shareit.item.comment.Comment;
 import ru.practicum.shareit.item.comment.CommentDto;
 import ru.practicum.shareit.item.model.Item;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class ItemMapper {
 
@@ -29,16 +31,34 @@ public class ItemMapper {
         );
     }
 
-    public static ItemWithBookingsDto mapToWithBookings(Item item, BookingDto lastBooking,
-                                                 BookingDto nextBooking, List<CommentDto> commentDtoList) {
+    public static ItemWithBookingsDto mapToWithBookings(Item item, Booking lastBooking,
+                                                        Booking nextBooking, List<Comment> commentList) {
+        ItemWithBookingsDto.Booking lastBooking1 = new ItemWithBookingsDto.Booking();
+        if (lastBooking != null) {
+            lastBooking1.setId(lastBooking.getId());
+            lastBooking1.setBookerId(lastBooking.getBooker().getId());
+        } else {
+            lastBooking1 = null;
+        }
+        ItemWithBookingsDto.Booking nextBooking1 = new ItemWithBookingsDto.Booking();
+        if (nextBooking != null) {
+            nextBooking1.setId(nextBooking.getId());
+            nextBooking1.setBookerId(nextBooking.getBooker().getId());
+        } else {
+            nextBooking1 = null;
+        }
+        List<ItemWithBookingsDto.Comment> comments = commentList.stream()
+                .map(comment -> new ItemWithBookingsDto.Comment(comment.getId(),
+                        comment.getText(), comment.getAuthor().getName(),
+                        comment.getCreated())).collect(Collectors.toList());
         return new ItemWithBookingsDto(
                 item.getId(),
                 item.getName(),
                 item.getDescription(),
                 item.getAvailable(),
-                lastBooking,
-                nextBooking,
-                commentDtoList
+                lastBooking1,
+                nextBooking1,
+                comments
         );
     }
 

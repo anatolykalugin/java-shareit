@@ -11,8 +11,8 @@ import java.time.LocalDateTime;
 @EqualsAndHashCode
 public class CommentDto {
     private Long id;
-    private String texts;
+    private String text;
     private Long itemId;
-    private Long authorId;
+    private String authorName;
     private LocalDateTime created;
 }

@@ -6,7 +6,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.Booking;
 import ru.practicum.shareit.booking.BookingRepository;
-import ru.practicum.shareit.booking.dto.BookingMapper;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.exception.ValidationException;
 import ru.practicum.shareit.item.ItemRepository;
@@ -19,6 +18,7 @@ import ru.practicum.shareit.item.dto.ItemMapper;
 import ru.practicum.shareit.item.dto.ItemWithBookingsDto;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.UserService;
+import ru.practicum.shareit.user.dto.UserMapper;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -64,11 +64,23 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public ItemDto getItemById(Long itemId) {
+    public ItemWithBookingsDto getItemById(Long itemId) {
         log.info("Запрос на получение вещи");
         Item item = itemRepository.findById(itemId)
                 .orElseThrow(() -> new NotFoundException("Нет такого предмета"));
-        return ItemMapper.mapTo(item, getItemsCommentsDtos(item.getId()));
+        return ItemMapper.mapToWithBookings(item,
+                bookingRepository.findTopByItem_IdAndEndBeforeOrderByEndDesc(item.getId(),
+                        LocalDateTime.now()),
+                bookingRepository.findTopByItem_IdAndStartAfterOrderByStartAsc(item.getId(),
+                        LocalDateTime.now()),
+                commentRepository.findCommentsByItemIdOrderByCreatedDesc(item.getId()));
+    }
+
+    @Override
+    public ItemDto getSimpleItemById(Long itemId) {
+        Item item = itemRepository.findById(itemId)
+                .orElseThrow(() -> new NotFoundException("Нет такого предмета"));
+        return ItemMapper.mapTo(item, getItemsCommentsDtos(itemId));
     }
 
     @Override
@@ -90,11 +102,11 @@ public class ItemServiceImpl implements ItemService {
             List<ItemWithBookingsDto> listToShow = new ArrayList<>();
             for (Item i : itemSet) {
                 ItemWithBookingsDto itemToAdd = ItemMapper.mapToWithBookings(i,
-                        BookingMapper.mapTo(bookingRepository.findTopByItem_IdAndEndBeforeOrderByEndDesc(i.getId(),
-                                LocalDateTime.now())),
-                        BookingMapper.mapTo(bookingRepository.findTopByItem_IdAndStartAfterOrderByStartAsc(i.getId(),
-                                LocalDateTime.now())),
-                        getItemsCommentsDtos(i.getId()));
+                        bookingRepository.findTopByItem_IdAndEndBeforeOrderByEndDesc(i.getId(),
+                                LocalDateTime.now()),
+                        bookingRepository.findTopByItem_IdAndStartAfterOrderByStartAsc(i.getId(),
+                                LocalDateTime.now()),
+                        commentRepository.findCommentsByItemIdOrderByCreatedDesc(i.getId()));
                 listToShow.add(itemToAdd);
             }
             return listToShow;
@@ -123,10 +135,12 @@ public class ItemServiceImpl implements ItemService {
     @Override
     @Transactional
     public CommentDto postComment(Long userId, Long itemId, CommentDto commentDto) {
-        if (isCommentValid(userId, itemId, commentDto.getTexts())) {
-            Comment comment = CommentMapper.mapFrom(commentDto);
+        log.info("Запрос на добавление комментария");
+        if (isCommentValid(userId, itemId, commentDto.getText())) {
+            Comment comment = CommentMapper.mapFrom(commentDto, UserMapper.mapFrom(userService.getUserById(userId)));
             comment.setCreated(LocalDateTime.now());
             commentRepository.save(comment);
+            log.info("Комментарий добавлен.");
             return CommentMapper.mapTo(comment);
         } else {
             throw new ValidationException("Не пройдена валидация комментария (аренда вещи не найдена)");
@@ -145,8 +159,8 @@ public class ItemServiceImpl implements ItemService {
     }
 
     private Item validateItemForUpdate(Long itemId, Long userId, Item item) {
-        if (userService.getUserById(userId) != null && getItemById(itemId).getOwner().equals(userId)) {
-            Item itemToUpdate = ItemMapper.mapFrom(getItemById(itemId));
+        if (userService.getUserById(userId) != null && getSimpleItemById(itemId).getOwner().equals(userId)) {
+            Item itemToUpdate = ItemMapper.mapFrom(getSimpleItemById(itemId));
             itemToUpdate.setOwner(userId);
             if (item.getName() != null && !item.getName().isBlank()) {
                 itemToUpdate.setName(item.getName());

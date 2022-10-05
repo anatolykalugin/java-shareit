@@ -11,7 +11,7 @@ public interface ItemService {
 
     ItemDto updateItem(Long userId, Long itemId, ItemDto itemDto);
 
-    ItemDto getItemById(Long id);
+    ItemWithBookingsDto getItemById(Long id);
 
     void deleteItemById(Long id);
 
@@ -20,4 +20,6 @@ public interface ItemService {
     List<ItemDto> searchItemsByText(String text);
 
     CommentDto postComment(Long userId, Long itemId, CommentDto commentDto);
+
+    ItemDto getSimpleItemById(Long id);
 }
