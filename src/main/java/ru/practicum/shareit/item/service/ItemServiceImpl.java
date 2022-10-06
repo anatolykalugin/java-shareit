@@ -64,16 +64,21 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public ItemWithBookingsDto getItemById(Long itemId) {
+    public ItemWithBookingsDto getItemById(Long userId, Long itemId) {
         log.info("Запрос на получение вещи");
         Item item = itemRepository.findById(itemId)
                 .orElseThrow(() -> new NotFoundException("Нет такого предмета"));
-        return ItemMapper.mapToWithBookings(item,
-                bookingRepository.findTopByItem_IdAndEndBeforeOrderByEndDesc(item.getId(),
-                        LocalDateTime.now()),
-                bookingRepository.findTopByItem_IdAndStartAfterOrderByStartAsc(item.getId(),
-                        LocalDateTime.now()),
-                commentRepository.findCommentsByItemIdOrderByCreatedDesc(item.getId()));
+        if (item.getOwner().equals(userId)) {
+            return ItemMapper.mapToWithBookings(item,
+                    bookingRepository.findTopByItem_IdAndEndBeforeOrderByEndDesc(item.getId(),
+                            LocalDateTime.now()),
+                    bookingRepository.findTopByItem_IdAndStartAfterOrderByStartAsc(item.getId(),
+                            LocalDateTime.now()),
+                    commentRepository.findByItemIdOrderByCreatedDesc(item.getId()));
+        } else {
+            return ItemMapper.mapToWithBookings(item ,null, null,
+                    commentRepository.findByItemIdOrderByCreatedDesc(item.getId()));
+        }
     }
 
     @Override
@@ -106,7 +111,7 @@ public class ItemServiceImpl implements ItemService {
                                 LocalDateTime.now()),
                         bookingRepository.findTopByItem_IdAndStartAfterOrderByStartAsc(i.getId(),
                                 LocalDateTime.now()),
-                        commentRepository.findCommentsByItemIdOrderByCreatedDesc(i.getId()));
+                        commentRepository.findByItemIdOrderByCreatedDesc(i.getId()));
                 listToShow.add(itemToAdd);
             }
             return listToShow;
@@ -137,7 +142,8 @@ public class ItemServiceImpl implements ItemService {
     public CommentDto postComment(Long userId, Long itemId, CommentDto commentDto) {
         log.info("Запрос на добавление комментария");
         if (isCommentValid(userId, itemId, commentDto.getText())) {
-            Comment comment = CommentMapper.mapFrom(commentDto, UserMapper.mapFrom(userService.getUserById(userId)));
+            Comment comment = CommentMapper.mapFrom(commentDto, ItemMapper.mapFrom(getSimpleItemById(itemId)),
+                    UserMapper.mapFrom(userService.getUserById(userId)));
             comment.setCreated(LocalDateTime.now());
             commentRepository.save(comment);
             log.info("Комментарий добавлен.");
@@ -148,7 +154,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
     private List<CommentDto> getItemsCommentsDtos(Long itemId) {
-        return commentRepository.findCommentsByItemIdOrderByCreatedDesc(itemId)
+        return commentRepository.findByItemIdOrderByCreatedDesc(itemId)
                 .stream()
                 .map(CommentMapper::mapTo)
                 .collect(Collectors.toList());

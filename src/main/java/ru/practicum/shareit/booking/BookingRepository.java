@@ -13,11 +13,12 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
     List<Booking> findBookingsByBooker_IdAndStatusOrderByStartDesc(Long bookerId, Status status);
 
     @Query("select b from Booking b WHERE b.booker.id = :id and b.start < :time and b.end > :time " +
-            "and upper(b.status) = upper('APPROVED') order by b.start desc ")
+            " order by b.start desc ")
     List<Booking> findCurrentApprovedBookingsByBooker(@Param("id") Long bookerId, @Param("time") LocalDateTime time);
 
     @Query("select b from Booking b WHERE b.booker.id = :id and b.start > :time " +
-            "and upper(b.status) = upper('APPROVED') order by b.start desc ")
+            "and (upper(b.status) = upper('APPROVED') or upper(b.status) = upper('WAITING')) " +
+            "order by b.start desc ")
     List<Booking> findFutureApprovedBookingsByBooker(@Param("id") Long bookerId, @Param("time") LocalDateTime time);
 
     @Query("select b from Booking b WHERE b.booker.id = :id and b.end < :time " +
@@ -30,11 +31,12 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
     List<Booking> findBookingsByItemOwnerAndStatus(Long ownerId, Status status);
 
     @Query("select b from Booking b join b.item i on b.item.id = i.id where i.owner = :id " +
-            "and b.start < :time and b.end > :time and upper(b.status) = upper('APPROVED') order by b.start desc")
+            "and b.start < :time and b.end > :time order by b.start desc")
     List<Booking> findCurrentApprovedBookingsByOwner(@Param("id") Long ownerId, @Param("time") LocalDateTime time);
 
     @Query("select b from Booking b join b.item i on b.item.id = i.id where i.owner = :id " +
-            "and b.start > :time and upper(b.status) = upper('APPROVED') order by b.start desc")
+            "and b.start > :time and (upper(b.status) = upper('APPROVED') or upper(b.status) = upper('WAITING')) " +
+            "order by b.start desc")
     List<Booking> findFutureApprovedBookingsByOwner(@Param("id") Long ownerId, @Param("time") LocalDateTime time);
 
     @Query("select b from Booking b join b.item i on b.item.id = i.id where i.owner = :id " +

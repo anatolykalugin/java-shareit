@@ -31,7 +31,7 @@ public class BookingServiceImpl implements BookingService {
     public BookingDto createBooking(BookingDto bookingDto, Long bookerId) {
         log.info("Запрос на добавление брони");
         if (userService.getUserById(bookerId) != null &&
-                itemService.getItemById(bookingDto.getItemId()) != null) {
+                itemService.getSimpleItemById(bookingDto.getItemId()) != null) {
             Booking booking = BookingMapper.mapFrom(bookingDto, UserMapper.mapFrom(userService.getUserById(bookerId)),
                     ItemMapper.mapFrom(itemService.getSimpleItemById(bookingDto.getItemId())));
             if (!itemService.getSimpleItemById(bookingDto.getItemId()).getOwner().equals(bookerId)) {
@@ -166,7 +166,7 @@ public class BookingServiceImpl implements BookingService {
     }
 
     private boolean isBookingValid(Booking booking) {
-        return itemService.getItemById(booking.getItem().getId()).getAvailable() &&
+        return itemService.getSimpleItemById(booking.getItem().getId()).getAvailable() &&
                 !booking.getEnd().isBefore(LocalDateTime.now()) &&
                 !booking.getStart().isBefore(LocalDateTime.now()) &&
                 !booking.getEnd().isBefore(booking.getStart());

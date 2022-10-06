@@ -21,5 +21,5 @@ public class ItemDto {
     private String description;
     private Boolean available;
     private Long owner;
-    private List<CommentDto> commentDtoList;
+    private List<CommentDto> comments;
 }

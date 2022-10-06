@@ -19,7 +19,7 @@ public class ItemWithBookingsDto {
     private Boolean available;
     private Booking lastBooking;
     private Booking nextBooking;
-    private List<Comment> commentDtoList;
+    private List<Comment> comments;
 
     @Getter
     @Setter
