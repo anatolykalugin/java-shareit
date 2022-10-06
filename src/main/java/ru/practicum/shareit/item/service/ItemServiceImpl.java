@@ -76,7 +76,7 @@ public class ItemServiceImpl implements ItemService {
                             LocalDateTime.now()),
                     commentRepository.findByItemIdOrderByCreatedDesc(item.getId()));
         } else {
-            return ItemMapper.mapToWithBookings(item ,null, null,
+            return ItemMapper.mapToWithBookings(item, null, null,
                     commentRepository.findByItemIdOrderByCreatedDesc(item.getId()));
         }
     }

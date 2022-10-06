@@ -17,15 +17,15 @@ public class BookingMapper {
             if (booking.getBooker() != null) {
                 booker.setId(booking.getBooker().getId());
             }
-        return new BookingDto(
-                booking.getId(),
-                booking.getStart(),
-                booking.getEnd(),
-                booking.getItem().getId(),
-                item,
-                booker,
-                booking.getStatus()
-        );
+            return new BookingDto(
+                    booking.getId(),
+                    booking.getStart(),
+                    booking.getEnd(),
+                    booking.getItem().getId(),
+                    item,
+                    booker,
+                    booking.getStatus()
+            );
         } else {
             return new BookingDto();
         }
