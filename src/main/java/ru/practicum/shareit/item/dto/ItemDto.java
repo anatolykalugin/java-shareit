@@ -1,6 +1,7 @@
 package ru.practicum.shareit.item.dto;
 
 import lombok.*;
+import lombok.experimental.FieldDefaults;
 import ru.practicum.shareit.item.comment.CommentDto;
 
 import javax.validation.constraints.NotBlank;
@@ -8,18 +9,18 @@ import java.util.List;
 
 @Getter
 @Setter
-@NoArgsConstructor
 @AllArgsConstructor
 @ToString
 @EqualsAndHashCode
+@FieldDefaults(level = AccessLevel.PRIVATE)
 @Builder
 public class ItemDto {
-    private Long id;
+    Long id;
     @NotBlank
-    private String name;
+    String name;
     @NotBlank
-    private String description;
-    private Boolean available;
-    private Long owner;
-    private List<CommentDto> comments;
+    String description;
+    Boolean available;
+    Long owner;
+    List<CommentDto> comments;
 }

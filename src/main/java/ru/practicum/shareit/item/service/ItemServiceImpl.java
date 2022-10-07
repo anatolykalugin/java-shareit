@@ -70,9 +70,9 @@ public class ItemServiceImpl implements ItemService {
                 .orElseThrow(() -> new NotFoundException("Нет такого предмета"));
         if (item.getOwner().equals(userId)) {
             return ItemMapper.mapToWithBookings(item,
-                    bookingRepository.findTopByItem_IdAndEndBeforeOrderByEndDesc(item.getId(),
+                    bookingRepository.findTopByItem_IdAndEndPeriodBeforeOrderByEndPeriodDesc(item.getId(),
                             LocalDateTime.now()),
-                    bookingRepository.findTopByItem_IdAndStartAfterOrderByStartAsc(item.getId(),
+                    bookingRepository.findTopByItem_IdAndStartPeriodAfterOrderByStartPeriodAsc(item.getId(),
                             LocalDateTime.now()),
                     commentRepository.findByItemIdOrderByCreatedDesc(item.getId()));
         } else {
@@ -107,9 +107,9 @@ public class ItemServiceImpl implements ItemService {
             List<ItemWithBookingsDto> listToShow = new ArrayList<>();
             for (Item i : itemSet) {
                 ItemWithBookingsDto itemToAdd = ItemMapper.mapToWithBookings(i,
-                        bookingRepository.findTopByItem_IdAndEndBeforeOrderByEndDesc(i.getId(),
+                        bookingRepository.findTopByItem_IdAndEndPeriodBeforeOrderByEndPeriodDesc(i.getId(),
                                 LocalDateTime.now()),
-                        bookingRepository.findTopByItem_IdAndStartAfterOrderByStartAsc(i.getId(),
+                        bookingRepository.findTopByItem_IdAndStartPeriodAfterOrderByStartPeriodAsc(i.getId(),
                                 LocalDateTime.now()),
                         commentRepository.findByItemIdOrderByCreatedDesc(i.getId()));
                 listToShow.add(itemToAdd);

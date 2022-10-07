@@ -93,32 +93,32 @@ public class BookingServiceImpl implements BookingService {
     @Override
     public List<BookingDto> getBookingsForBooker(Long bookerId, String state) {
         if (userService.getUserById(bookerId) != null) {
-            List<Booking> bookingList;
+            List<Booking> bookingSet;
             switch (state) {
                 case "ALL":
-                    bookingList = bookingRepository.findBookingsByBooker_IdOrderByStartDesc(bookerId);
+                    bookingSet = bookingRepository.findBookingsByBooker_IdOrderByStartPeriodDesc(bookerId);
                     break;
                 case "CURRENT":
-                    bookingList = bookingRepository.findCurrentApprovedBookingsByBooker(bookerId, LocalDateTime.now());
+                    bookingSet = bookingRepository.findCurrentApprovedBookingsByBooker(bookerId, LocalDateTime.now());
                     break;
                 case "PAST":
-                    bookingList = bookingRepository.findPastApprovedBookingsByBooker(bookerId, LocalDateTime.now());
+                    bookingSet = bookingRepository.findPastApprovedBookingsByBooker(bookerId, LocalDateTime.now());
                     break;
                 case "FUTURE":
-                    bookingList = bookingRepository.findFutureApprovedBookingsByBooker(bookerId, LocalDateTime.now());
+                    bookingSet = bookingRepository.findFutureApprovedBookingsByBooker(bookerId, LocalDateTime.now());
                     break;
                 case "WAITING":
-                    bookingList = bookingRepository.findBookingsByBooker_IdAndStatusOrderByStartDesc(bookerId,
+                    bookingSet = bookingRepository.findBookingsByBooker_IdAndStatusOrderByStartPeriodDesc(bookerId,
                             Status.WAITING);
                     break;
                 case "REJECTED":
-                    bookingList = bookingRepository.findBookingsByBooker_IdAndStatusOrderByStartDesc(bookerId,
+                    bookingSet = bookingRepository.findBookingsByBooker_IdAndStatusOrderByStartPeriodDesc(bookerId,
                             Status.REJECTED);
                     break;
                 default:
                     throw new ValidationException(String.format("Unknown state: %s", state));
             }
-            return bookingList.stream()
+            return bookingSet.stream()
                     .map(BookingMapper::mapTo)
                     .collect(Collectors.toList());
         } else {
@@ -133,30 +133,30 @@ public class BookingServiceImpl implements BookingService {
             throw new ValidationException(String.format("Unknown state: %s", state));
         } else {
             if (userService.getUserById(ownerId) != null) {
-                List<Booking> bookingList;
+                List<Booking> bookingSet;
                 switch (state) {
                     case "ALL":
-                        bookingList = bookingRepository.findBookingsByOwner(ownerId);
+                        bookingSet = bookingRepository.findBookingsByOwner(ownerId);
                         break;
                     case "CURRENT":
-                        bookingList = bookingRepository.findCurrentApprovedBookingsByOwner(ownerId, LocalDateTime.now());
+                        bookingSet = bookingRepository.findCurrentApprovedBookingsByOwner(ownerId, LocalDateTime.now());
                         break;
                     case "PAST":
-                        bookingList = bookingRepository.findPastApprovedBookingsByOwner(ownerId, LocalDateTime.now());
+                        bookingSet = bookingRepository.findPastApprovedBookingsByOwner(ownerId, LocalDateTime.now());
                         break;
                     case "FUTURE":
-                        bookingList = bookingRepository.findFutureApprovedBookingsByOwner(ownerId, LocalDateTime.now());
+                        bookingSet = bookingRepository.findFutureApprovedBookingsByOwner(ownerId, LocalDateTime.now());
                         break;
                     case "WAITING":
-                        bookingList = bookingRepository.findBookingsByItemOwnerAndStatus(ownerId, Status.WAITING);
+                        bookingSet = bookingRepository.findBookingsByItemOwnerAndStatus(ownerId, Status.WAITING);
                         break;
                     case "REJECTED":
-                        bookingList = bookingRepository.findBookingsByItemOwnerAndStatus(ownerId, Status.REJECTED);
+                        bookingSet = bookingRepository.findBookingsByItemOwnerAndStatus(ownerId, Status.REJECTED);
                         break;
                     default:
                         throw new ValidationException(String.format("Unknown state: %s", state));
                 }
-                return bookingList.stream()
+                return bookingSet.stream()
                         .map(BookingMapper::mapTo)
                         .collect(Collectors.toList());
             } else {
@@ -167,9 +167,9 @@ public class BookingServiceImpl implements BookingService {
 
     private boolean isBookingValid(Booking booking) {
         return itemService.getSimpleItemById(booking.getItem().getId()).getAvailable() &&
-                !booking.getEnd().isBefore(LocalDateTime.now()) &&
-                !booking.getStart().isBefore(LocalDateTime.now()) &&
-                !booking.getEnd().isBefore(booking.getStart());
+                !booking.getEndPeriod().isBefore(LocalDateTime.now()) &&
+                !booking.getStartPeriod().isBefore(LocalDateTime.now()) &&
+                !booking.getEndPeriod().isBefore(booking.getStartPeriod());
     }
 
 }

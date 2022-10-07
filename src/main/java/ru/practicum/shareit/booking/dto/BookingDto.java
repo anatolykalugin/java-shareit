@@ -1,6 +1,7 @@
 package ru.practicum.shareit.booking.dto;
 
 import lombok.*;
+import lombok.experimental.FieldDefaults;
 import ru.practicum.shareit.booking.Status;
 
 import java.time.LocalDateTime;
@@ -9,30 +10,33 @@ import java.time.LocalDateTime;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE)
 @Builder
 public class BookingDto {
-    private Long id;
-    private LocalDateTime start;
-    private LocalDateTime end;
-    private Long itemId;
-    private Item item;
-    private User booker;
-    private Status status;
+    Long id;
+    LocalDateTime start;
+    LocalDateTime end;
+    Long itemId;
+    Item item;
+    User booker;
+    Status status;
 
     @Getter
     @Setter
     @AllArgsConstructor
     @NoArgsConstructor
+    @FieldDefaults(level = AccessLevel.PRIVATE)
     public static class Item {
-        private Long id;
-        private String name;
+        Long id;
+        String name;
     }
 
     @Getter
     @Setter
     @AllArgsConstructor
     @NoArgsConstructor
+    @FieldDefaults(level = AccessLevel.PRIVATE)
     public static class User {
-        private Long id;
+        Long id;
     }
 }

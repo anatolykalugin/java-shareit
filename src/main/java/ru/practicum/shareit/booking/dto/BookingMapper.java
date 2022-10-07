@@ -19,8 +19,8 @@ public class BookingMapper {
             }
             return new BookingDto(
                     booking.getId(),
-                    booking.getStart(),
-                    booking.getEnd(),
+                    booking.getStartPeriod(),
+                    booking.getEndPeriod(),
                     booking.getItem().getId(),
                     item,
                     booker,
