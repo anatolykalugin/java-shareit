@@ -1,11 +1,9 @@
 package ru.practicum.shareit.user.model;
 
 import lombok.*;
-import ru.practicum.shareit.Create;
-import ru.practicum.shareit.Update;
 
+import javax.persistence.*;
 import javax.validation.constraints.Email;
-import javax.validation.constraints.NotNull;
 
 @Getter
 @Setter
@@ -13,11 +11,16 @@ import javax.validation.constraints.NotNull;
 @AllArgsConstructor
 @ToString
 @EqualsAndHashCode
+@Entity
+@Table(name = "users")
 public class User {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
     private Long id;
-    @NotNull(groups = {Create.class})
+    @Column(name = "name", nullable = false)
     private String name;
-    @Email(groups = {Create.class, Update.class})
-    @NotNull(groups = {Create.class})
+    @Email
+    @Column(name = "email", nullable = false, unique = true)
     private String email;
 }

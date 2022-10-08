@@ -1,24 +1,26 @@
 package ru.practicum.shareit.item.dto;
 
 import lombok.*;
-import ru.practicum.shareit.Create;
+import lombok.experimental.FieldDefaults;
+import ru.practicum.shareit.item.comment.CommentDto;
 
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
+import java.util.List;
 
 @Getter
 @Setter
-@NoArgsConstructor
 @AllArgsConstructor
 @ToString
 @EqualsAndHashCode
+@FieldDefaults(level = AccessLevel.PRIVATE)
+@Builder
 public class ItemDto {
-    private Long id;
-    @NotBlank(groups = {Create.class})
-    private String name;
-    @NotBlank(groups = {Create.class})
-    private String description;
-    @NotNull(groups = {Create.class})
-    private Boolean available;
-    private Long owner;
+    Long id;
+    @NotBlank
+    String name;
+    @NotBlank
+    String description;
+    Boolean available;
+    Long owner;
+    List<CommentDto> comments;
 }

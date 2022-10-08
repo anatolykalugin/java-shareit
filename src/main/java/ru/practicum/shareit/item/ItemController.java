@@ -1,53 +1,60 @@
 package ru.practicum.shareit.item;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.shareit.Create;
-import ru.practicum.shareit.Update;
+import ru.practicum.shareit.item.comment.CommentDto;
 import ru.practicum.shareit.item.dto.ItemDto;
-import ru.practicum.shareit.item.service.ItemServiceImpl;
+import ru.practicum.shareit.item.dto.ItemWithBookingsDto;
+import ru.practicum.shareit.item.service.ItemService;
 
+import javax.validation.Valid;
 import java.util.List;
-import java.util.Set;
 
 @RestController
 @RequestMapping("/items")
 public class ItemController {
 
     @Autowired
-    private ItemServiceImpl itemServiceImpl;
+    private ItemService itemService;
 
     @PostMapping
     public ItemDto createItem(@RequestHeader("X-Sharer-User-Id") Long userId,
-                              @RequestBody @Validated({Create.class}) ItemDto itemDto) {
-        return itemServiceImpl.createItem(userId, itemDto);
+                              @RequestBody @Valid ItemDto itemDto) {
+        return itemService.createItem(userId, itemDto);
     }
 
     @PatchMapping("/{id}")
     public ItemDto updateItem(@RequestHeader("X-Sharer-User-Id") Long userId,
                               @PathVariable Long id,
-                              @RequestBody @Validated({Update.class}) ItemDto itemDto) {
-        return itemServiceImpl.updateItem(userId, id, itemDto);
+                              @RequestBody ItemDto itemDto) {
+        return itemService.updateItem(userId, id, itemDto);
+    }
+
+    @PostMapping("/{itemId}/comment")
+    public CommentDto postComment(@RequestHeader("X-Sharer-User-Id") Long userId,
+                                  @PathVariable Long itemId,
+                                  @RequestBody CommentDto commentDto) {
+        return itemService.postComment(userId, itemId, commentDto);
     }
 
     @GetMapping("/{id}")
-    public ItemDto getItemById(@PathVariable Long id) {
-        return itemServiceImpl.getItemById(id);
+    public ItemWithBookingsDto getItemById(@RequestHeader("X-Sharer-User-Id") Long userId,
+                                           @PathVariable Long id) {
+        return itemService.getItemById(userId, id);
     }
 
     @GetMapping
-    public Set<ItemDto> getUsersItems(@RequestHeader("X-Sharer-User-Id") Long userId) {
-        return itemServiceImpl.getUsersItems(userId);
+    public List<ItemWithBookingsDto> getUsersItems(@RequestHeader("X-Sharer-User-Id") Long userId) {
+        return itemService.getUsersItems(userId);
     }
 
     @DeleteMapping("/{id}")
     public void deleteItemById(@PathVariable Long id) {
-        itemServiceImpl.deleteItemById(id);
+        itemService.deleteItemById(id);
     }
 
     @GetMapping("/search")
     public List<ItemDto> searchItemsByText(@RequestParam String text) {
-        return itemServiceImpl.searchItemsByText(text);
+        return itemService.searchItemsByText(text);
     }
 }
