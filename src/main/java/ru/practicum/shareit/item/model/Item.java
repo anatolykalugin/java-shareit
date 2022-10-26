@@ -1,6 +1,7 @@
 package ru.practicum.shareit.item.model;
 
 import lombok.*;
+import ru.practicum.shareit.request.ItemRequest;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
@@ -28,4 +29,7 @@ public class Item {
     private Boolean available;
     @Column(name = "owner")
     private Long owner;
+    @JoinColumn(name = "request_id")
+    @OneToOne
+    private ItemRequest request;
 }

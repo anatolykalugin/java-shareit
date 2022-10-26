@@ -1,10 +1,7 @@
 package ru.practicum.shareit.request;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.request.dto.ItemRequestDto;
 import ru.practicum.shareit.request.service.ItemRequestService;
 
@@ -18,23 +15,27 @@ public class ItemRequestController {
     private ItemRequestService itemRequestService;
 
     @PostMapping
-    public ItemRequestDto createRequest() {
-        return itemRequestService.createRequest();
+    public ItemRequestDto createRequest(@RequestHeader("X-Sharer-User-Id") Long requestorId,
+                                        @RequestBody ItemRequestDto itemRequestDto) {
+        return itemRequestService.createRequest(itemRequestDto, requestorId);
     }
 
     @GetMapping
-    public List<ItemRequestDto> getRequests() {
-        return itemRequestService.getRequests();
+    public List<ItemRequestDto> getRequests(@RequestHeader("X-Sharer-User-Id") Long authorId) {
+        return itemRequestService.getRequests(authorId);
     }
 
     @GetMapping("/{requestId}")
-    public ItemRequestDto getRequestById() {
-        return itemRequestService.getRequestById();
+    public ItemRequestDto getRequestById(@RequestHeader("X-Sharer-User-Id") Long userId,
+                                         @PathVariable Long requestId) {
+        return itemRequestService.getRequestById(userId, requestId);
     }
 
     @GetMapping("/all")
-    public List<ItemRequestDto> getOthersRequests() {
-        return itemRequestService.getOthersRequests();
+    public List<ItemRequestDto> getOthersRequests(@RequestHeader("X-Sharer-User-Id") Long userId,
+                                                  @RequestParam(name = "from", defaultValue = "0") int index,
+                                                  @RequestParam(name = "size", defaultValue = "10") int quantity) {
+        return itemRequestService.getOthersRequests(userId, index, quantity);
     }
 
 }

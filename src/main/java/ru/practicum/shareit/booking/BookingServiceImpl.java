@@ -2,6 +2,8 @@ package ru.practicum.shareit.booking;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.dto.BookingDto;
@@ -91,67 +93,35 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public List<BookingDto> getBookingsForBooker(Long bookerId, String state) {
-        if (userService.getUserById(bookerId) != null) {
-            List<Booking> bookingSet;
-            switch (state) {
-                case "ALL":
-                    bookingSet = bookingRepository.findBookingsByBooker_IdOrderByStartPeriodDesc(bookerId);
-                    break;
-                case "CURRENT":
-                    bookingSet = bookingRepository.findCurrentApprovedBookingsByBooker(bookerId, LocalDateTime.now());
-                    break;
-                case "PAST":
-                    bookingSet = bookingRepository.findPastApprovedBookingsByBooker(bookerId, LocalDateTime.now());
-                    break;
-                case "FUTURE":
-                    bookingSet = bookingRepository.findFutureApprovedBookingsByBooker(bookerId, LocalDateTime.now());
-                    break;
-                case "WAITING":
-                    bookingSet = bookingRepository.findBookingsByBooker_IdAndStatusOrderByStartPeriodDesc(bookerId,
-                            Status.WAITING);
-                    break;
-                case "REJECTED":
-                    bookingSet = bookingRepository.findBookingsByBooker_IdAndStatusOrderByStartPeriodDesc(bookerId,
-                            Status.REJECTED);
-                    break;
-                default:
-                    throw new ValidationException(String.format("Unknown state: %s", state));
-            }
-            return bookingSet.stream()
-                    .map(BookingMapper::mapTo)
-                    .collect(Collectors.toList());
-        } else {
-            throw new NotFoundException("Юзер не найден");
-        }
-    }
-
-    @Override
-    public List<BookingDto> getBookingsForOwner(Long ownerId, String state) {
-        if (!state.equals("ALL") && !state.equals("CURRENT") && !state.equals("PAST") && !state.equals("WAITING") &&
-                !state.equals("REJECTED") && !state.equals("FUTURE")) {
-            throw new ValidationException(String.format("Unknown state: %s", state));
-        } else {
-            if (userService.getUserById(ownerId) != null) {
+    public List<BookingDto> getBookingsForBooker(Long bookerId, String state, int index, int quantity) {
+        if (index >= 0 && quantity > 0) {
+            if (userService.getUserById(bookerId) != null) {
                 List<Booking> bookingSet;
+                Pageable pageable = PageRequest.of(index / quantity, quantity);
                 switch (state) {
                     case "ALL":
-                        bookingSet = bookingRepository.findBookingsByOwner(ownerId);
+                        bookingSet = bookingRepository.findBookingsByBooker_IdOrderByStartPeriodDesc(bookerId,
+                                pageable);
                         break;
                     case "CURRENT":
-                        bookingSet = bookingRepository.findCurrentApprovedBookingsByOwner(ownerId, LocalDateTime.now());
+                        bookingSet = bookingRepository.findCurrentApprovedBookingsByBooker(bookerId, LocalDateTime.now(),
+                                pageable);
                         break;
                     case "PAST":
-                        bookingSet = bookingRepository.findPastApprovedBookingsByOwner(ownerId, LocalDateTime.now());
+                        bookingSet = bookingRepository.findPastApprovedBookingsByBooker(bookerId, LocalDateTime.now(),
+                                pageable);
                         break;
                     case "FUTURE":
-                        bookingSet = bookingRepository.findFutureApprovedBookingsByOwner(ownerId, LocalDateTime.now());
+                        bookingSet = bookingRepository.findFutureApprovedBookingsByBooker(bookerId, LocalDateTime.now(),
+                                pageable);
                         break;
                     case "WAITING":
-                        bookingSet = bookingRepository.findBookingsByItemOwnerAndStatus(ownerId, Status.WAITING);
+                        bookingSet = bookingRepository.findBookingsByBooker_IdAndStatusOrderByStartPeriodDesc(bookerId,
+                                Status.WAITING, pageable);
                         break;
                     case "REJECTED":
-                        bookingSet = bookingRepository.findBookingsByItemOwnerAndStatus(ownerId, Status.REJECTED);
+                        bookingSet = bookingRepository.findBookingsByBooker_IdAndStatusOrderByStartPeriodDesc(bookerId,
+                                Status.REJECTED, pageable);
                         break;
                     default:
                         throw new ValidationException(String.format("Unknown state: %s", state));
@@ -162,6 +132,57 @@ public class BookingServiceImpl implements BookingService {
             } else {
                 throw new NotFoundException("Юзер не найден");
             }
+        } else {
+            throw new ValidationException("Неверные вводные");
+        }
+    }
+
+    @Override
+    public List<BookingDto> getBookingsForOwner(Long ownerId, String state, int index, int quantity) {
+        if (index >= 0 && quantity > 0) {
+            if (!state.equals("ALL") && !state.equals("CURRENT") && !state.equals("PAST") && !state.equals("WAITING") &&
+                    !state.equals("REJECTED") && !state.equals("FUTURE")) {
+                throw new ValidationException(String.format("Unknown state: %s", state));
+            } else {
+                if (userService.getUserById(ownerId) != null) {
+                    List<Booking> bookingSet;
+                    Pageable pageable = PageRequest.of(index / quantity, quantity);
+                    switch (state) {
+                        case "ALL":
+                            bookingSet = bookingRepository.findBookingsByOwner(ownerId, pageable);
+                            break;
+                        case "CURRENT":
+                            bookingSet = bookingRepository.findCurrentApprovedBookingsByOwner(ownerId, LocalDateTime.now(),
+                                    pageable);
+                            break;
+                        case "PAST":
+                            bookingSet = bookingRepository.findPastApprovedBookingsByOwner(ownerId, LocalDateTime.now(),
+                                    pageable);
+                            break;
+                        case "FUTURE":
+                            bookingSet = bookingRepository.findFutureApprovedBookingsByOwner(ownerId, LocalDateTime.now(),
+                                    pageable);
+                            break;
+                        case "WAITING":
+                            bookingSet = bookingRepository.findBookingsByItemOwnerAndStatus(ownerId, Status.WAITING,
+                                    pageable);
+                            break;
+                        case "REJECTED":
+                            bookingSet = bookingRepository.findBookingsByItemOwnerAndStatus(ownerId, Status.REJECTED,
+                                    pageable);
+                            break;
+                        default:
+                            throw new ValidationException(String.format("Unknown state: %s", state));
+                    }
+                    return bookingSet.stream()
+                            .map(BookingMapper::mapTo)
+                            .collect(Collectors.toList());
+                } else {
+                    throw new NotFoundException("Юзер не найден");
+                }
+            }
+        } else {
+            throw new ValidationException("Неверные вводные");
         }
     }
 

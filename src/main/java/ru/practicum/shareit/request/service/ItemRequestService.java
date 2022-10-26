@@ -5,11 +5,11 @@ import ru.practicum.shareit.request.dto.ItemRequestDto;
 import java.util.List;
 
 public interface ItemRequestService {
-    ItemRequestDto createRequest();
+    ItemRequestDto createRequest(ItemRequestDto itemRequestDto, Long requestorId);
 
-    ItemRequestDto getRequestById();
+    ItemRequestDto getRequestById(Long userId, Long requestId);
 
-    List<ItemRequestDto> getRequests();
+    List<ItemRequestDto> getRequests(Long authorId);
 
-    List<ItemRequestDto> getOthersRequests();
+    List<ItemRequestDto> getOthersRequests(Long userId, int index, int quantity);
 }

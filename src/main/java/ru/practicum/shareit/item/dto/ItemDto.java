@@ -23,4 +23,5 @@ public class ItemDto {
     Boolean available;
     Long owner;
     List<CommentDto> comments;
+    Long requestId;
 }
