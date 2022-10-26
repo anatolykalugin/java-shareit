@@ -149,9 +149,10 @@ public class ItemServiceTest {
 
     @Test
     void shouldCreateComment() throws InterruptedException {
+        LocalDateTime dateTime = LocalDateTime.now();
         BookingDto bookingDto = BookingDto.builder()
-                .start(LocalDateTime.now().plusSeconds(1))
-                .end(LocalDateTime.now().plusSeconds(2))
+                .start(dateTime.plusSeconds(1))
+                .end(dateTime.plusSeconds(2))
                 .itemId(item.getId())
                 .build();
         Booking booking = BookingMapper.mapFrom(bookingService.createBooking(bookingDto, user2.getId()), user2, item);

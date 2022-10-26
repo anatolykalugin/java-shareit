@@ -42,7 +42,7 @@ public class BookingServiceImpl implements BookingService {
                     bookingRepository.save(booking);
                     return BookingMapper.mapTo(booking);
                 } else {
-                    throw new ValidationException("Не пройдена валидация бронмрования.");
+                    throw new ValidationException("Не пройдена валидация бронирования.");
                 }
             } else {
                 throw new NotFoundException("Нельзя забронировать свою вещь");
