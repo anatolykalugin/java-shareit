@@ -4,9 +4,13 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import ru.practicum.shareit.booking.Booking;
 import ru.practicum.shareit.booking.BookingRepository;
 import ru.practicum.shareit.booking.BookingService;
+import ru.practicum.shareit.booking.dto.BookingDto;
+import ru.practicum.shareit.booking.dto.BookingMapper;
 import ru.practicum.shareit.exception.ValidationException;
+import ru.practicum.shareit.item.comment.CommentDto;
 import ru.practicum.shareit.item.comment.CommentRepository;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ItemMapper;
@@ -141,5 +145,26 @@ public class ItemServiceTest {
                 owner.getId(), null);
         assertThrows(ValidationException.class, () -> itemService.createItem(itemNoAvailable.getOwner(),
                 ItemMapper.mapTo(itemNoAvailable, new ArrayList<>())));
+    }
+
+    @Test
+    void shouldPostComment() throws InterruptedException {
+        itemService.createItem(item.getOwner(), ItemMapper.mapTo(item, new ArrayList<>()));
+        BookingDto bookingDto = BookingDto.builder()
+                .start(LocalDateTime.now().plusSeconds(1))
+                .end(LocalDateTime.now().plusSeconds(2))
+                .itemId(item.getId())
+                .build();
+        Booking booking = BookingMapper.mapFrom(bookingService.createBooking(bookingDto, user2.getId()), user2, item);
+        bookingService.updateBooking(booking.getId(), owner.getId(), true);
+        CommentDto commentDto = new CommentDto();
+        commentDto.setText("Awesome product!");
+        Thread.sleep(10000);
+        CommentDto comment = itemService.postComment(
+                user2.getId(),
+                item.getId(),
+                commentDto
+        );
+        assertEquals(commentRepository.findById(comment.getId()).orElse(null).getText(), comment.getText());
     }
 }
