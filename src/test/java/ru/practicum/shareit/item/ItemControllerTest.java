@@ -142,4 +142,16 @@ public class ItemControllerTest {
                 .andExpect(jsonPath("$.text", is(commentDto1.getText())))
                 .andExpect(jsonPath("$.authorName", is(userDto1.getName())));
     }
+
+    @Test
+    void shouldDeleteItem() throws Exception {
+        mockMvc.perform(delete("/items/" + itemDto1.getId())
+                        .content(mapper.writeValueAsString(itemDto1))
+                        .characterEncoding(StandardCharsets.UTF_8)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+        verify(itemService, times(1))
+                .deleteItemById(itemDto1.getId());
+    }
 }
