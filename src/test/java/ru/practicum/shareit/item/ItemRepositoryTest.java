@@ -2,6 +2,7 @@ package ru.practicum.shareit.item;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
@@ -31,7 +32,7 @@ public class ItemRepositoryTest {
     private Item item2;
 
     @BeforeEach
-    void before() {
+    void beforeEach() {
         user1 = userRepository.save(new User(1L, "Anton", "anton@mail.ru"));
         user2 = userRepository.save(new User(2L, "Denis", "denis@mail.ru"));
         item1 = itemRepository.save(new Item(1L, "Book", "Interesting",
@@ -47,14 +48,16 @@ public class ItemRepositoryTest {
     }
 
     @Test
+    @Order(1)
     void shouldFindByOwner() {
         final List<Item> owner = itemRepository.getItemsByOwnerOrderByIdAsc(user1.getId());
         assertNotNull(owner);
-        assertEquals(1L, owner.get(0).getId());
+        assertEquals(3L, owner.get(0).getId());
         assertEquals("Book", owner.get(0).getName());
     }
 
     @Test
+    @Order(2)
     void shouldFindByText() {
         Collection<Item> itemList = itemRepository.searchItemsByText("st");
         assertThat(itemList.size(), is(2));
