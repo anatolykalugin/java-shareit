@@ -113,7 +113,7 @@ public class ItemServiceTest {
     }
 
     @Test
-    void EmptyTextSearchTest() {
+    void emptyTextSearchTest() {
         assertEquals(new ArrayList<>(),
                 itemService.searchItemsByText(" "));
     }
