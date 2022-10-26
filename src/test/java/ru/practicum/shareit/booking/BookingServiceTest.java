@@ -245,4 +245,27 @@ public class BookingServiceTest {
                 .getBookingsForOwner(user1.getId(), "ALL", -1, -1));
     }
 
+    @Test
+    void shouldFailGetOwnersBookingsUnknownState() {
+        assertThrows(ValidationException.class, () -> bookingService
+                .getBookingsForOwner(user1.getId(), "huehuehue", 0, 10));
+    }
+
+    @Test
+    void shouldFailGetBookersBookingsUnknownState() {
+        assertThrows(ValidationException.class, () -> bookingService
+                .getBookingsForBooker(user1.getId(), "huehuehue", 0, 10));
+    }
+
+    @Test
+    void shouldFailGetBookersBookingsWrongUser() {
+        assertThrows(NotFoundException.class, () -> bookingService
+                .getBookingsForBooker(10L, "ALL", 0, 10));
+    }
+
+    @Test
+    void shouldFailGetOwnersBookingsWrongUser() {
+        assertThrows(NotFoundException.class, () -> bookingService
+                .getBookingsForOwner(10L, "ALL", 0, 10));
+    }
 }

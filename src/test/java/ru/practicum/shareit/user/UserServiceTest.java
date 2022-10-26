@@ -76,6 +76,12 @@ public class UserServiceTest {
     }
 
     @Test
+    void shouldFailUpdatingUserWrongUser() {
+        UserDto user6 = new UserDto(4L, "Igor", "dima2@mail.ru");
+        assertThrows(NotFoundException.class, () -> userService.updateUser(10L, user6));
+    }
+
+    @Test
     void shouldDeleteUserById() {
         userService.deleteUserById(1L);
         assertNull(userRepository.findById(1L).orElse(null));
