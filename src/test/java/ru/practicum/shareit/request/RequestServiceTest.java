@@ -58,7 +58,13 @@ public class RequestServiceTest {
     }
 
     @Test
-    void shouldFailGetRequestsNegativeIndex() {
+    void shouldGetOthersRequests() {
+        assertEquals(itemRequestService.getOthersRequests(2L, 0, 10).get(0).getId(),
+                List.of(ItemRequestDtoMapper.mapTo(itemRequest, new ArrayList<>())).get(0).getId());
+    }
+
+    @Test
+    void shouldFailGetOthersRequestsNegativeIndex() {
         assertThrows(ValidationException.class, () -> itemRequestService
                 .getOthersRequests(1L, -1, 10));
     }
