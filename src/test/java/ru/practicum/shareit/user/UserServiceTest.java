@@ -5,6 +5,8 @@ import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
+import ru.practicum.shareit.exception.DuplicateEmailException;
+import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.exception.ValidationException;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.dto.UserMapper;
@@ -68,8 +70,19 @@ public class UserServiceTest {
     }
 
     @Test
+    void shouldFailCreatingNewUserDupeEmail() {
+        User user5 = new User(4L, "Igor", "dima@mail.ru");
+        assertThrows(DuplicateEmailException.class, () -> userService.createUser(UserMapper.mapTo(user5)));
+    }
+
+    @Test
     void shouldDeleteUserById() {
         userService.deleteUserById(1L);
         assertNull(userRepository.findById(1L).orElse(null));
+    }
+
+    @Test
+    void shouldFailDeleteUserById() {
+        assertThrows(NotFoundException.class, () -> userService.deleteUserById(6L));
     }
 }
