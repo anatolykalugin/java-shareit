@@ -103,7 +103,7 @@ public class ItemServiceImpl implements ItemService {
         try {
             itemRepository.deleteById(itemId);
         } catch (RuntimeException e) {
-            throw new NotFoundException("Нет такого предмета");
+            throw new NotFoundException("Не найден такой предмет");
         }
     }
 

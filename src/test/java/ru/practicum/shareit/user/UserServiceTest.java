@@ -78,7 +78,7 @@ public class UserServiceTest {
     @Test
     void shouldFailUpdatingUserWrongUser() {
         UserDto user6 = new UserDto(4L, "Igor", "dima2@mail.ru");
-        assertThrows(NotFoundException.class, () -> userService.updateUser(10L, user6));
+        assertThrows(NotFoundException.class, () -> userService.updateUser(-1L, user6));
     }
 
     @Test
