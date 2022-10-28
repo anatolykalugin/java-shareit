@@ -11,7 +11,6 @@ import javax.validation.constraints.NotBlank;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
-@EqualsAndHashCode
 @Entity
 @Table(name = "items")
 public class Item {
@@ -30,6 +29,6 @@ public class Item {
     @Column(name = "owner")
     private Long owner;
     @JoinColumn(name = "request_id")
-    @OneToOne
+    @ManyToOne
     private ItemRequest request;
 }

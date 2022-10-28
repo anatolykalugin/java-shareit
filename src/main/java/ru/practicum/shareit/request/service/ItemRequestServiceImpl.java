@@ -34,6 +34,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
     @Override
     @Transactional
     public ItemRequestDto createRequest(ItemRequestDto itemRequestDto, Long requestorId) {
+        log.info("Получен запрос на создание реквеста");
         if (userService.getUserById(requestorId) != null) {
             if (itemRequestDto.getDescription() != null && !itemRequestDto.getDescription().isBlank()) {
                 User requestor = UserMapper.mapFrom(userService.getUserById(requestorId));
@@ -42,15 +43,18 @@ public class ItemRequestServiceImpl implements ItemRequestService {
                 itemRequestRepository.save(itemRequest);
                 return ItemRequestDtoMapper.mapTo(itemRequest, null);
             } else {
+                log.warn("Ошибка - некорректный запрос");
                 throw new ValidationException("Описание запроса не может быть пустым");
             }
         } else {
+            log.warn("Ошибка - неправильный айди юзера");
             throw new NotFoundException("Данный пользователь не найден");
         }
     }
 
     @Override
     public ItemRequestDto getRequestById(Long userId, Long requestId) {
+        log.info("Получен запрос на получение реквеста по айди");
         if (userService.getUserById(userId) != null) {
             try {
                 ItemRequest itemRequest = itemRequestRepository.getReferenceById(requestId);
@@ -58,15 +62,18 @@ public class ItemRequestServiceImpl implements ItemRequestService {
                         Sort.by("id").descending());
                 return ItemRequestDtoMapper.mapTo(itemRequest, items);
             } catch (RuntimeException e) {
+                log.warn("Ошибка - отсутствующий запрос");
                 throw new NotFoundException("Данный запрос не найден");
             }
         } else {
+            log.warn("Ошибка - неправильный айди юзера");
             throw new NotFoundException("Данный пользователь не найден");
         }
     }
 
     @Override
     public List<ItemRequestDto> getRequests(Long authorId) {
+        log.info("Получен запрос на получение реквестов");
         if (userService.getUserById(authorId) != null) {
             return itemRequestRepository.getByRequestorIdOrderByCreatedAsc(authorId)
                     .stream()
@@ -77,12 +84,14 @@ public class ItemRequestServiceImpl implements ItemRequestService {
                     })
                     .collect(Collectors.toList());
         } else {
+            log.warn("Ошибка - неправильный айди юзера");
             throw new NotFoundException("Данный юзер не найден");
         }
     }
 
     @Override
     public List<ItemRequestDto> getOthersRequests(Long userId, int index, int quantity) {
+        log.info("Получен запрос на получение всех реквестов");
         if (index >= 0 && quantity > 0) {
             return itemRequestRepository.getByRequestorIdNot(userId,
                             PageRequest.of(index / quantity, quantity,
@@ -95,6 +104,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
                     })
                     .collect(Collectors.toList());
         } else {
+            log.warn("Ошибка - некорректный запрос");
             throw new ValidationException("Неправильные вводные");
         }
     }

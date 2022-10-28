@@ -16,14 +16,14 @@ public class ItemRequestDto {
     Long id;
     String description;
     LocalDateTime created;
-    List<Item> items;
+    List<ItemDto> items;
 
     @Getter
     @Setter
     @AllArgsConstructor
     @NoArgsConstructor
     @FieldDefaults(level = AccessLevel.PRIVATE)
-    public static class Item {
+    public static class ItemDto {
         Long id;
         String name;
         String description;

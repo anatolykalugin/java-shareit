@@ -11,10 +11,10 @@ import java.util.stream.Collectors;
 public class ItemRequestDtoMapper {
 
     public static ItemRequestDto mapTo(ItemRequest itemRequest, List<Item> items) {
-        List<ItemRequestDto.Item> itemDtosList = new ArrayList<>();
+        List<ItemRequestDto.ItemDto> itemDtosList = new ArrayList<>();
         if (items != null) {
             itemDtosList = items.stream()
-                    .map(item -> new ItemRequestDto.Item(item.getId(),
+                    .map(item -> new ItemRequestDto.ItemDto(item.getId(),
                             item.getName(),
                             item.getDescription(),
                             item.getAvailable(),

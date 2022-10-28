@@ -10,7 +10,6 @@ import javax.validation.constraints.Email;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
-@EqualsAndHashCode
 @Entity
 @Table(name = "users")
 public class User {
