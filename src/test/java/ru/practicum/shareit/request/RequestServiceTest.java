@@ -3,6 +3,7 @@ package ru.practicum.shareit.request;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.exception.ValidationException;
 import ru.practicum.shareit.request.dto.ItemRequestDto;
 import ru.practicum.shareit.request.dto.ItemRequestDtoMapper;
@@ -67,5 +68,36 @@ public class RequestServiceTest {
     void shouldFailGetOthersRequestsNegativeIndex() {
         assertThrows(ValidationException.class, () -> itemRequestService
                 .getOthersRequests(1L, -1, 10));
+    }
+
+    @Test
+    void shouldFailCreateRequestWrongUser() {
+        assertThrows(NotFoundException.class, () -> itemRequestService
+                .createRequest(new ItemRequestDto(), 30L));
+    }
+
+    @Test
+    void shouldFailCreateRequestNullDescription() {
+        ItemRequestDto itemRequestDto = new ItemRequestDto(5L, null, LocalDateTime.now(), null);
+        assertThrows(ValidationException.class, () -> itemRequestService
+                .createRequest(itemRequestDto, 1L));
+    }
+
+    @Test
+    void shouldFailGetByIdWrongUser() {
+        assertThrows(NotFoundException.class, () -> itemRequestService
+                .getRequestById(20L, 1L));
+    }
+
+    @Test
+    void shouldFailGetByIdWrongRequest() {
+        assertThrows(NotFoundException.class, () -> itemRequestService
+                .getRequestById(1L, 15L));
+    }
+
+    @Test
+    void shouldFailGetRequestsWrongUser() {
+        assertThrows(NotFoundException.class, () -> itemRequestService
+                .getRequests(14L));
     }
 }
