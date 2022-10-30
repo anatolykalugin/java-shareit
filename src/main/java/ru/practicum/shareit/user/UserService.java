@@ -24,16 +24,15 @@ public class UserService {
     @Transactional
     public UserDto createUser(UserDto userDto) {
         log.info("Запрос на создание юзера");
-        if (userDto.getEmail() != null) {
-            try {
-                User userToAdd = UserMapper.mapFrom(userDto);
-                userRepository.save(userToAdd);
-                return UserMapper.mapTo(userToAdd);
-            } catch (RuntimeException e) {
-                throw new DuplicateEmailException("Юзер с такой почтой уже существует");
-            }
-        } else {
+        if (userDto.getEmail() == null || userDto.getEmail().isBlank()) {
             throw new ValidationException("Отсутствует email.");
+        }
+        try {
+            User userToAdd = UserMapper.mapFrom(userDto);
+            userRepository.save(userToAdd);
+            return UserMapper.mapTo(userToAdd);
+        } catch (RuntimeException e) {
+            throw new DuplicateEmailException("Юзер с такой почтой уже существует");
         }
     }
 

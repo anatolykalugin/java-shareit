@@ -43,22 +43,21 @@ public class ItemServiceImpl implements ItemService {
     @Transactional
     public ItemDto createItem(Long userId, ItemDto itemDto) {
         log.info("Запрос на добавление вещи");
-        if (userService.getUserById(userId) != null) {
-            Item item = ItemMapper.mapFrom(itemDto);
-            item.setOwner(userId);
-            if (isItemValid(item)) {
-                if (item.getRequest() != null) {
-                    ItemRequest itemRequest = itemRequestRepository.findById(item.getRequest().getId())
-                            .orElseThrow(() -> new NotFoundException("Реквест не найден"));
-                    item.setRequest(itemRequest);
-                }
-                itemRepository.save(item);
-                return ItemMapper.mapTo(item, getItemsCommentsDtos(item.getId()));
-            } else {
-                throw new ValidationException("Не пройдена валидация предмета.");
-            }
-        } else {
+        if (userService.getUserById(userId) == null) {
             throw new NotFoundException("Нет такого юзера");
+        }
+        Item item = ItemMapper.mapFrom(itemDto);
+        item.setOwner(userId);
+        if (isItemValid(item)) {
+            if (item.getRequest() != null) {
+                ItemRequest itemRequest = itemRequestRepository.findById(item.getRequest().getId())
+                        .orElseThrow(() -> new NotFoundException("Реквест не найден"));
+                item.setRequest(itemRequest);
+            }
+            itemRepository.save(item);
+            return ItemMapper.mapTo(item, getItemsCommentsDtos(item.getId()));
+        } else {
+            throw new ValidationException("Не пройдена валидация предмета.");
         }
     }
 

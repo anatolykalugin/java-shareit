@@ -38,39 +38,36 @@ public class ItemRequestServiceImpl implements ItemRequestService {
     @Transactional
     public ItemRequestDto createRequest(ItemRequestDto itemRequestDto, Long requestorId) {
         log.info("Получен запрос на создание реквеста");
-        if (userService.getUserById(requestorId) != null) {
-            if (itemRequestDto.getDescription() != null && !itemRequestDto.getDescription().isBlank()) {
-                User requestor = UserMapper.mapFrom(userService.getUserById(requestorId));
-                ItemRequest itemRequest = ItemRequestDtoMapper.mapFrom(itemRequestDto, requestor);
-                itemRequest.setCreated(LocalDateTime.now());
-                itemRequestRepository.save(itemRequest);
-                return ItemRequestDtoMapper.mapTo(itemRequest, null);
-            } else {
-                log.warn("Ошибка - некорректный запрос");
-                throw new ValidationException("Описание запроса не может быть пустым");
-            }
+        if (userService.getUserById(requestorId) == null) {
+            throw new NotFoundException("Данный пользователь не найден");
+        }
+        if (itemRequestDto.getDescription() != null && !itemRequestDto.getDescription().isBlank()) {
+            User requestor = UserMapper.mapFrom(userService.getUserById(requestorId));
+            ItemRequest itemRequest = ItemRequestDtoMapper.mapFrom(itemRequestDto, requestor);
+            itemRequest.setCreated(LocalDateTime.now());
+            itemRequestRepository.save(itemRequest);
+            return ItemRequestDtoMapper.mapTo(itemRequest, null);
         } else {
             log.warn("Ошибка - неправильный айди юзера");
-            throw new NotFoundException("Данный пользователь не найден");
+            throw new ValidationException("Описание запроса не может быть пустым");
         }
     }
 
     @Override
     public ItemRequestDto getRequestById(Long userId, Long requestId) {
         log.info("Получен запрос на получение реквеста по айди");
-        if (userService.getUserById(userId) != null) {
-            try {
-                ItemRequest itemRequest = itemRequestRepository.getReferenceById(requestId);
-                List<Item> items = itemRepository.getByRequestId(itemRequest.getId(),
-                        Sort.by("id").descending());
-                return ItemRequestDtoMapper.mapTo(itemRequest, items);
-            } catch (RuntimeException e) {
-                log.warn("Ошибка - отсутствующий запрос");
-                throw new NotFoundException("Данный запрос не найден");
-            }
-        } else {
+        if (userService.getUserById(userId) == null) {
             log.warn("Ошибка - неправильный айди юзера");
             throw new NotFoundException("Данный пользователь не найден");
+        }
+        try {
+            ItemRequest itemRequest = itemRequestRepository.getReferenceById(requestId);
+            List<Item> items = itemRepository.getByRequestId(itemRequest.getId(),
+                    Sort.by("id").descending());
+            return ItemRequestDtoMapper.mapTo(itemRequest, items);
+        } catch (RuntimeException e) {
+            log.warn("Ошибка - отсутствующий запрос");
+            throw new NotFoundException("Данный запрос не найден");
         }
     }
 
