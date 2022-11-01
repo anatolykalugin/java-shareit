@@ -4,6 +4,7 @@ import ru.practicum.shareit.booking.Booking;
 import ru.practicum.shareit.item.comment.Comment;
 import ru.practicum.shareit.item.comment.CommentDto;
 import ru.practicum.shareit.item.model.Item;
+import ru.practicum.shareit.request.ItemRequest;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -11,24 +12,31 @@ import java.util.stream.Collectors;
 public class ItemMapper {
 
     public static ItemDto mapTo(Item item, List<CommentDto> commentDtoList) {
+        Long requestId = (item.getRequest() != null) ? item.getRequest().getId() : null;
         return new ItemDto(
                 item.getId(),
                 item.getName(),
                 item.getDescription(),
                 item.getAvailable(),
                 item.getOwner(),
-                commentDtoList
+                commentDtoList,
+                requestId
         );
     }
 
     public static Item mapFrom(ItemDto itemDto) {
-        return new Item(
-                itemDto.getId(),
-                itemDto.getName(),
-                itemDto.getDescription(),
-                itemDto.getAvailable(),
-                itemDto.getOwner()
-        );
+        Item item = new Item();
+        if (itemDto.getRequestId() != null) {
+            ItemRequest itemRequest = new ItemRequest();
+            itemRequest.setId(itemDto.getRequestId());
+            item.setRequest(itemRequest);
+        }
+        item.setId(itemDto.getId());
+        item.setName(itemDto.getName());
+        item.setDescription(itemDto.getDescription());
+        item.setAvailable(itemDto.getAvailable());
+        item.setOwner(itemDto.getOwner());
+        return item;
     }
 
     public static ItemWithBookingsDto mapToWithBookings(Item item, Booking lastBooking,

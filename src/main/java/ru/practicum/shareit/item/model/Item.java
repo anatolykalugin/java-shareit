@@ -1,6 +1,7 @@
 package ru.practicum.shareit.item.model;
 
 import lombok.*;
+import ru.practicum.shareit.request.ItemRequest;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
@@ -10,7 +11,6 @@ import javax.validation.constraints.NotBlank;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
-@EqualsAndHashCode
 @Entity
 @Table(name = "items")
 public class Item {
@@ -28,4 +28,7 @@ public class Item {
     private Boolean available;
     @Column(name = "owner")
     private Long owner;
+    @JoinColumn(name = "request_id")
+    @ManyToOne
+    private ItemRequest request;
 }
