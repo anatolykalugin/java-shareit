@@ -4,7 +4,6 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 import ru.practicum.shareit.item.comment.CommentDto;
 
-import javax.validation.constraints.NotBlank;
 import java.util.List;
 
 @Getter
@@ -16,9 +15,7 @@ import java.util.List;
 @Builder
 public class ItemDto {
     Long id;
-    @NotBlank
     String name;
-    @NotBlank
     String description;
     Boolean available;
     Long owner;
